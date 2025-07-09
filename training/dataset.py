@@ -23,6 +23,10 @@ except ImportError:
 
 #----------------------------------------------------------------------------
 
+
+
+
+
 class Dataset(torch.utils.data.Dataset):
     def __init__(self,
         name,                   # Name of the dataset.
@@ -236,3 +240,47 @@ class ImageFolderDataset(Dataset):
         return labels
 
 #----------------------------------------------------------------------------
+
+
+
+
+class CustomImageFolderDataset(ImageFolderDataset):
+    def __init__(self, path, resolution=None, **super_kwargs):
+        self._path = path
+        self._zipfile = None
+
+        # Use a custom file walker to find Good_quality folders
+        self._type = 'dir'
+        self._all_fnames = set()
+        print('Path set to :', self._path)
+        self._all_fnames = self.load_paths(self._path)
+        if len(self._all_fnames) == 0:
+            raise IOError('No image files found in the specified path')
+        else:
+            print('Found', len(self._all_fnames), 'image files in the specified path')
+
+        PIL.Image.init()
+        self._image_fnames = sorted(self._all_fnames)
+
+        name = os.path.splitext(os.path.basename(self._path.rstrip('/')))[0]
+        raw_shape = [len(self._image_fnames)] + list(self._load_raw_image(0).shape)
+
+        if resolution is not None and (raw_shape[2] != resolution or raw_shape[3] != resolution):
+            raise IOError('Image files do not match the specified resolution')
+
+        super().__init__(path=path, **super_kwargs)
+
+    def load_paths(self,inDir):
+
+        print('Loading paths...')
+        folders = [name for name in os.listdir(inDir) if os.path.isdir(os.path.join(inDir, name))]
+        
+        image_paths = []
+
+        for f in folders:
+            # image filepaths inside 'Good_quality'
+            image_dir = os.path.join(inDir, f, 'Results_1', 'M1', 'Good_quality')
+            if os.path.isdir(image_dir):
+                png_files = [os.path.join(image_dir, fname) for fname in os.listdir(image_dir) if fname.endswith('.png')]
+                image_paths.extend(png_files)
+        return image_paths

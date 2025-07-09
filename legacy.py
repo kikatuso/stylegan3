@@ -121,7 +121,7 @@ def convert_tf_generator(tf_G):
     network_class = networks_stylegan2.Generator
     kwargs = dnnlib.EasyDict(
         z_dim               = kwarg('latent_size',          512),
-        c_dim               = kwarg('label_size',           0),
+        c_dim               = kwarg('label_size',           1),
         w_dim               = kwarg('dlatent_size',         512),
         img_resolution      = kwarg('resolution',           1024),
         img_channels        = kwarg('num_channels',         3),
@@ -218,7 +218,7 @@ def convert_tf_discriminator(tf_D):
 
     # Convert kwargs.
     kwargs = dnnlib.EasyDict(
-        c_dim                   = kwarg('label_size',           0),
+        c_dim                   = kwarg('label_size',           1),
         img_resolution          = kwarg('resolution',           1024),
         img_channels            = kwarg('num_channels',         3),
         architecture            = kwarg('architecture',         'resnet'),
