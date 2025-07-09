@@ -10,6 +10,7 @@
 
 import os
 import re
+import sys
 from typing import List, Optional, Tuple, Union
 
 import click
@@ -76,13 +77,15 @@ def make_transform(translate: Tuple[float,float], angle: float):
 @click.option('--noise-mode', help='Noise mode', type=click.Choice(['const', 'random', 'none']), default='const', show_default=True)
 @click.option('--translate', help='Translate XY-coordinate (e.g. \'0.3,1\')', type=parse_vec2, default='0,0', show_default=True, metavar='VEC2')
 @click.option('--rotate', help='Rotation angle in degrees', type=float, default=0, show_default=True, metavar='ANGLE')
-@click.option('--outdir', help='Where to save the output images', type=str, required=True, metavar='DIR')
+@click.option('--modelname',help='name of the model', type=str, required=True, metavar='NAME', default='stylegan3-r-afhqv2-512x512')
+@click.option('--outdir', help='Where to save the output images', type=str, required=False, metavar='DIR',default='/gpfs3/well/papiez/users/zwk579/Results/stylegan3/log/')
 def generate_images(
     network_pkl: str,
     seeds: List[int],
     truncation_psi: float,
     noise_mode: str,
     outdir: str,
+    modelname: str,
     translate: Tuple[float,float],
     rotate: float,
     class_idx: Optional[int]
@@ -104,8 +107,10 @@ def generate_images(
 
     print('Loading networks from "%s"...' % network_pkl)
     device = torch.device('cuda')
+    outdir = os.path.join(outdir, modelname)
     with dnnlib.util.open_url(network_pkl) as f:
         G = legacy.load_network_pkl(f)['G_ema'].to(device) # type: ignore
+
 
     os.makedirs(outdir, exist_ok=True)
 
@@ -115,6 +120,7 @@ def generate_images(
         if class_idx is None:
             raise click.ClickException('Must specify class label with --class when using a conditional network')
         label[:, class_idx] = 1
+        outdir = os.path.join(outdir, f'class{class_idx:04d}')
     else:
         if class_idx is not None:
             print ('warn: --class=lbl ignored when running on an unconditional network')
@@ -140,6 +146,7 @@ def generate_images(
 #----------------------------------------------------------------------------
 
 if __name__ == "__main__":
+
     generate_images() # pylint: disable=no-value-for-parameter
 
 #----------------------------------------------------------------------------
