@@ -1,6 +1,5 @@
 #!/bin/bash
-
-sh preface.sh
+source ./preface.sh
 
 HOME=/gpfs3/well/papiez/users/zwk579
 
