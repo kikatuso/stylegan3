@@ -25,7 +25,13 @@ from torch_utils import custom_ops
 #----------------------------------------------------------------------------
 
 def subprocess_fn(rank, c, temp_dir):
-    dnnlib.util.Logger(file_name=os.path.join(c.run_dir, 'log.txt'), file_mode='a', should_flush=True)
+
+    if rank == 0:
+        print('Creating output directory...')
+        os.makedirs(c.run_dir)
+        with open(os.path.join(c.run_dir, 'training_options.json'), 'wt') as f:
+            json.dump(c, f, indent=2)
+        dnnlib.util.Logger(file_name=os.path.join(c.run_dir, 'log.txt'), file_mode='a', should_flush=True)
 
     # Init torch.distributed.
     if c.num_gpus > 1:
@@ -81,12 +87,6 @@ def launch_training(c, desc, outdir, dry_run):
     if dry_run:
         print('Dry run; exiting.')
         return
-
-    # Create output directory.
-    print('Creating output directory...')
-    os.makedirs(c.run_dir)
-    with open(os.path.join(c.run_dir, 'training_options.json'), 'wt') as f:
-        json.dump(c, f, indent=2)
 
     # Launch processes.
     print('Launching processes...')

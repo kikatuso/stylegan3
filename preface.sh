@@ -28,3 +28,6 @@ echo "CPATH: $CPATH"
 echo "CPLUS_INCLUDE_PATH: $CPLUS_INCLUDE_PATH"
 
 echo $CUDA_HOME
+
+
+
