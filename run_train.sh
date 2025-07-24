@@ -2,7 +2,7 @@
 source ./preface.sh
 
 
-folder='/gpfs3/well/papiez/users/zwk579/Results/stylegan3/log/stylegan3-ukb/00021-stylegan3-t-256x256px-gpus2-batch32-gamma10'
+folder='/gpfs3/well/papiez/users/zwk579/Results/stylegan3/log/stylegan3-ukb/00022-stylegan3-t-256x256px-gpus2-batch32-gamma10'
 
 resume_path=$(ls "$folder"/network-snapshot-*.pkl 2>/dev/null | sort -V | tail -n 1)
 
@@ -19,10 +19,10 @@ python train.py \
   --modelname stylegan3-ukb \
   --cfg stylegan3-t \
   --data /gpfs3/well/papiez/users/zwk579/.temp_data/256x256px \
-  --gpus 2 \
+  --gpus 1 \
   --batch 32 \
   --gamma 10.0 \
-  --kimg 3000 \
+  --kimg 3001 \
   --snap 10 \
   --resume $resume_path \
   --resume_kimg $resume_kimg \
